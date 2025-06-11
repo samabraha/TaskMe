@@ -27,6 +27,7 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
+    implementation(compose.materialIconsExtended)
     val jsonSerializerVersion = "1.8.0"
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$jsonSerializerVersion")
     val sqliteVersion = "3.49.1.0"

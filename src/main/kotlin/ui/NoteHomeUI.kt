@@ -1,30 +1,39 @@
 package ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.window.DialogWindow
 import model.Note
 import vm.NoteViewModel
 
 @Composable
 fun NoteHomeUI(noteViewModel: NoteViewModel) {
     val notes = noteViewModel.notes
+    var showDialog by remember { mutableStateOf(false) }
 
     Column {
         notes.forEach { note ->
             NoteView(note = note)
         }
     }
-    FloatingActionButton(onClick = {}) {
-        Icon(MaterialIcon.add, contentDescription = "Add Note")
+    FloatingActionButton(onClick = { showDialog = true }) {
+        Icon(Icons.Rounded.Add, contentDescription = "Add Note")
+    }
+    DialogWindow(
+        visible = showDialog, onCloseRequest = { showDialog = false },
+    ) {
+        Column {
+            NewNote()
+            FloatingActionButton(onClick = { showDialog = false }) {
+                Icon(Icons.Rounded.Add, contentDescription = "Save Note")
+            }
+        }
     }
 }
 
@@ -40,10 +49,22 @@ fun NoteView(note: Note) {
 
 @Composable
 fun NewNote() {
+    Column {
+        TextInputBox(label = "Title")
+        TextInputBox(label = "Content")
+        TextInputBox(label = "Note Type")
+    }
+}
+
+@Composable
+fun TextInputBox(
+    label: String,
+) {
     var value by remember { mutableStateOf("") }
     TextField(
         singleLine = true,
         value = value,
         onValueChange = { value = it },
-        label = { Text(text = "Enter note title") })
+        label = { Text(text = label) },
+    )
 }

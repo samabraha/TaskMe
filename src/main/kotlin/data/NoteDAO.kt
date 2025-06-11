@@ -33,4 +33,20 @@ class NoteDAO(val connection: Connection) {
         }
         return notes
     }
+
+    fun createTable() {
+        val sql = """
+            CREATE TABLE IF NOT EXISTS notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title ${{SqliteType.NonNullText.text}},
+                content ${SqliteType.NonNullText.text},
+                created_at INTEGER NOT NULL,
+                note_type ${SqliteType.NonNullText.text}
+            )
+        """
+        connection.createStatement().use { statement ->
+            statement.execute(sql)
+        }
+    }
 }
+

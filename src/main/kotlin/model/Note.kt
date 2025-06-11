@@ -3,7 +3,7 @@ package model
 class Note(
     val title: String,
     val content: String,
-    val createdAt: Long,
+    val createdAt: Long = System.currentTimeMillis(),
     val noteType: NoteType = NoteType.Regular
 ) {
 }
