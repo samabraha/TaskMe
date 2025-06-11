@@ -22,7 +22,6 @@ class NoteViewModel(val noteRepository: NoteRepository) {
         }
     }
 
-    @OptIn(ExperimentalUuidApi::class)
     fun updateNote(note: Note) {
         noteRepository.addNote(note)
     }

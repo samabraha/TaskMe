@@ -20,6 +20,7 @@ class NoteDAO(val connection: Connection) {
             statement.setString(NoteTableColumn.ID.columnIndex, note.id.toString())
             statement.setString(NoteTableColumn.TITLE.columnIndex, note.title)
             statement.setString(NoteTableColumn.CONTENT.columnIndex, note.content)
+            statement.setString(NoteTableColumn.CATEGORY.columnIndex, note.category)
             statement.setLong(NoteTableColumn.CREATED_AT.columnIndex, note.createdAt)
             statement.setString(NoteTableColumn.NOTE_TYPE.columnIndex, note.noteType.name)
             statement.executeUpdate()
@@ -36,6 +37,7 @@ class NoteDAO(val connection: Connection) {
                 val id = resultSet.getString(NoteTableColumn.ID.columnName)
                 val title = resultSet.getString(NoteTableColumn.TITLE.columnName)
                 val content = resultSet.getString(NoteTableColumn.CONTENT.columnName)
+                val category = resultSet.getString(NoteTableColumn.CATEGORY.columnName)
                 val createdAt = resultSet.getLong(NoteTableColumn.CREATED_AT.columnName)
                 val noteType = NoteType.valueOf(resultSet.getString(NoteTableColumn.NOTE_TYPE.columnName))
                 notes.add(
@@ -43,6 +45,7 @@ class NoteDAO(val connection: Connection) {
                         id = Uuid.parse(id),
                         title = title,
                         content = content,
+                        category = category,
                         createdAt = createdAt,
                         noteType = noteType
                     )
@@ -78,8 +81,9 @@ enum class NoteTableColumn(val columnName: String, val type: SqliteType, val col
     ID("note_id", SqliteType.NonNullText, 1),
     TITLE("title", SqliteType.NonNullText, 2),
     CONTENT("content", SqliteType.NonNullText, 3),
-    CREATED_AT("created_at", SqliteType.Integer, 4),
-    NOTE_TYPE("note_type", SqliteType.NonNullText, 5);
+    CATEGORY("category", SqliteType.NonNullText, 4),
+    CREATED_AT("created_at", SqliteType.Integer, 5),
+    NOTE_TYPE("note_type", SqliteType.NonNullText, 6);
 
     companion object {
         const val TABLE_NAME = "notes"
