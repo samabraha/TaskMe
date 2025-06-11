@@ -10,10 +10,10 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 class NoteDAO(val connection: Connection) {
     // Function to add a note to the database
-    fun addNote(note: Note) {
+    fun upsertNote(note: Note) {
         logger.info("Adding note with ID: ${note.id} to the database")
         val sql =
-            """INSERT INTO ${NoteTableColumn.TABLE_NAME} (${NoteTableColumn.entries.joinToString { it.columnName }}) 
+            """REPLACE INTO ${NoteTableColumn.TABLE_NAME} (${NoteTableColumn.entries.joinToString { it.columnName }}) 
                 VALUES (${NoteTableColumn.entries.joinToString { "?" }})"""
         connection.prepareStatement(sql).use { statement ->
             logger.info("Prepared SQL statement: $sql")
@@ -26,7 +26,6 @@ class NoteDAO(val connection: Connection) {
         }
     }
 
-    // Function to get all notes from the database
     fun getAllNotes(): List<Note> {
         logger.info("Fetching all notes from the database")
         val sql = "SELECT * FROM ${NoteTableColumn.TABLE_NAME}"
@@ -60,9 +59,17 @@ class NoteDAO(val connection: Connection) {
             CREATE TABLE IF NOT EXISTS ${NoteTableColumn.TABLE_NAME} ( $columnDefs, 
             PRIMARY KEY (${NoteTableColumn.ID.columnName}))
         """
-        logger.info("Executing SQL to create table: $sql")
         connection.createStatement().use { statement ->
             statement.execute(sql)
+        }
+    }
+
+    fun deleteNote(noteId: Uuid) {
+        logger.info("Deleting note with ID: $noteId from the database")
+        val sql = "DELETE FROM ${NoteTableColumn.TABLE_NAME} WHERE ${NoteTableColumn.ID.columnName} = ?"
+        connection.prepareStatement(sql).use { statement ->
+            statement.setString(1, noteId.toString())
+            statement.executeUpdate()
         }
     }
 }
