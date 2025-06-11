@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.*
 import ui.HomeUI
-import vm.HomeViewModel
 import java.util.logging.Logger
 
 
@@ -17,7 +16,7 @@ val logger: Logger = Logger.getLogger("com.develogica.heelel_desk")
 @Composable
 @Preview
 fun App() {
-    val homeViewModel by remember { mutableStateOf(HomeViewModel()) }
+    val homeViewModel by remember { mutableStateOf(AppManager.homeViewModel) }
 
     MaterialTheme {
         Column {
@@ -25,6 +24,7 @@ fun App() {
         }
     }
 }
+
 
 fun main() = application {
     val windowState = rememberWindowState(

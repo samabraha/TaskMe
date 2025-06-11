@@ -2,6 +2,7 @@ package vm
 
 import data.NoteRepository
 import model.Note
+import kotlin.uuid.ExperimentalUuidApi
 
 
 class NoteViewModel(val noteRepository: NoteRepository) {
@@ -11,17 +12,15 @@ class NoteViewModel(val noteRepository: NoteRepository) {
         when (action) {
             is NoteAction.AddNote -> addNote(action.title, action.content)
             is NoteAction.GetAllNotes -> getAllNotes()
-            // Handle other actions like update and delete here
         }
     }
 
-    // Example function to add a note
+    @OptIn(ExperimentalUuidApi::class)
     fun addNote(title: String, content: String) {
-        val newNote = Note(title, content, System.currentTimeMillis())
+        val newNote = Note(title = title, content = content)
         noteRepository.addNote(newNote)
     }
 
-    // Example function to get all notes
     fun getAllNotes(): List<Note> {
         return noteRepository.loadAllNotes()
     }

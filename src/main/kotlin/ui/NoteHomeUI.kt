@@ -10,6 +10,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.DialogWindow
 import model.Note
+import vm.NoteAction
 import vm.NoteViewModel
 
 @Composable
@@ -28,12 +29,12 @@ fun NoteHomeUI(noteViewModel: NoteViewModel) {
     DialogWindow(
         visible = showDialog, onCloseRequest = { showDialog = false },
     ) {
-        Column {
-            NewNote()
-            FloatingActionButton(onClick = { showDialog = false }) {
-                Icon(Icons.Rounded.Add, contentDescription = "Save Note")
+        NewNote(
+            addNoteAction = { action ->
+                noteViewModel.handleNoteAction(action)
+                showDialog = false
             }
-        }
+        )
     }
 }
 
@@ -48,23 +49,40 @@ fun NoteView(note: Note) {
 }
 
 @Composable
-fun NewNote() {
-    Column {
-        TextInputBox(label = "Title")
-        TextInputBox(label = "Content")
-        TextInputBox(label = "Note Type")
+fun NewNote(addNoteAction: (NoteAction) -> Unit) {
+    var title by remember { mutableStateOf("") }
+    var content by remember { mutableStateOf("") }
+
+    val saveNote: () -> Unit = {
+        addNoteAction(NoteAction.AddNote(title = title, content = content))
     }
+
+    Column {
+        TextInputBox(label = "Title", onValueChange = { title = it })
+        TextInputBox(label = "Content", onValueChange = { content = it })
+
+        FloatingActionButton(onClick = { saveNote() }) {
+            Icon(Icons.Rounded.Add, contentDescription = "Save Note")
+        }
+
+    }
+
+
 }
 
 @Composable
 fun TextInputBox(
     label: String,
+    onValueChange: (String) -> Unit = {},
 ) {
     var value by remember { mutableStateOf("") }
     TextField(
         singleLine = true,
         value = value,
-        onValueChange = { value = it },
+        onValueChange = {
+            value = it
+            onValueChange(it)
+        },
         label = { Text(text = label) },
     )
 }
