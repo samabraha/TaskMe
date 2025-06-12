@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTime::class)
+@file:OptIn(ExperimentalTime::class, ExperimentalUuidApi::class)
 
 package ui
 
@@ -18,7 +18,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogWindow
 import model.Note
 import vm.NoteAction
 import vm.NoteViewModel
@@ -30,41 +29,30 @@ import kotlin.uuid.ExperimentalUuidApi
 @Composable
 fun NoteHomeUI(noteViewModel: NoteViewModel, modifier: Modifier = Modifier) {
     val notes = noteViewModel.notes
-    var showDialog by remember { mutableStateOf(false) }
     var selectedNote by remember { mutableStateOf<Note?>(null) }
 
-    Column(modifier = modifier) {
-        Row {
-            NoteList(notes = notes, selectNote = { note ->
-                selectedNote = note
-                showDialog = true
-            }, modifier = Modifier.fillMaxWidth(0.75f))
+    Row(modifier = modifier.fillMaxSize()) {
+        NoteList(
+            notes = notes,
+            selectNote = { note -> selectedNote = if (selectedNote == note) null else note },
+            modifier = Modifier.fillMaxWidth(0.5f)
+        )
 
-            FloatingActionButton(onClick = {
-                selectedNote = null
-                showDialog = true
-            }) {
-                Icon(Icons.Rounded.Add, contentDescription = "Add Note")
-            }
+        selectedNote?.let {
+            EditableNote(
+                note = it,
+                addNoteAction = { action ->
+                    noteViewModel.handleNoteAction(action)
+                })
         }
 
-        if (showDialog) {
-            ShowNoteDialog(note = selectedNote, onDismiss = { showDialog = false }, addNoteAction = { action ->
-                noteViewModel.handleNoteAction(action)
-                showDialog = false
-            })
+        FloatingActionButton(
+            onClick = { selectedNote = Note(title = "", content = "", category = "") }) {
+            Icon(Icons.Rounded.Add, contentDescription = "Add Note")
         }
     }
 }
 
-@Composable
-fun ShowNoteDialog(
-    note: Note?, onDismiss: () -> Unit, addNoteAction: (NoteAction) -> Unit
-) {
-    DialogWindow(onCloseRequest = onDismiss, title = note?.title ?: "New Note") {
-        EditNote(note = note, addNoteAction = addNoteAction)
-    }
-}
 
 @Composable
 fun NoteList(notes: List<Note>, selectNote: (Note) -> Unit, modifier: Modifier = Modifier) {
@@ -79,9 +67,11 @@ fun NoteList(notes: List<Note>, selectNote: (Note) -> Unit, modifier: Modifier =
 @Composable
 fun NoteView(note: Note, selectNote: (Note) -> Unit, modifier: Modifier = Modifier) {
     val titleStyle = MaterialTheme.typography.titleLarge.copy(
-        fontWeight = FontWeight.Bold, shadow = Shadow(color = Color.Black, offset = Offset(1f, 1f), blurRadius = 2f)
+        fontWeight = FontWeight.Bold,
+        shadow = Shadow(color = Color.Black, offset = Offset(1f, 1f), blurRadius = 2f)
     )
-    val contentStyle = MaterialTheme.typography.bodyLarge
+
+    MaterialTheme.typography.bodyLarge
     val smallTextStyle = MaterialTheme.typography.bodySmall
 
     Card(
@@ -96,38 +86,39 @@ fun NoteView(note: Note, selectNote: (Note) -> Unit, modifier: Modifier = Modifi
         )
         Spacer(modifier = Modifier.height(10.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Text(text = "Created At: ${Instant.fromEpochMilliseconds(note.createdAt)}", style = smallTextStyle)
+            Text(
+                text = "Created At: ${Instant.fromEpochMilliseconds(note.createdAt)}",
+                style = smallTextStyle
+            )
             Text(text = "Note Type: ${note.noteType}")
         }
     }
 }
 
-@OptIn(ExperimentalUuidApi::class)
 @Composable
-fun EditNote(note: Note?, addNoteAction: (NoteAction) -> Unit, modifier: Modifier = Modifier) {
-    var title by remember { mutableStateOf(note?.title ?: "") }
-    var content by remember { mutableStateOf(note?.content ?: "") }
-    var category by remember { mutableStateOf(note?.category ?: "General") }
+fun EditableNote(note: Note, addNoteAction: (NoteAction) -> Unit, modifier: Modifier = Modifier) {
+    var title by remember { mutableStateOf(note.title) }
+    var content by remember { mutableStateOf(note.content) }
+    var category by remember { mutableStateOf(note.category) }
 
     val saveNote: () -> Unit = {
-        val newNote = note?.let {
+        val newNote = note.let {
             Note(
                 id = it.id,
                 title = title,
                 content = content,
                 category = category,
                 createdAt = it.createdAt,
-                noteType = it.noteType
+                noteType = it.noteType,
+                color = it.color
             )
-        } ?: Note(title = title, content = content, category = category)
+        }
 
         addNoteAction(NoteAction.AddNote(newNote))
-        title = ""
-        content = ""
     }
 
     val deleteNote: () -> Unit = {
-        note?.let { addNoteAction(NoteAction.DeleteNote(it.id)) }
+        addNoteAction(NoteAction.DeleteNote(note.id))
     }
 
     val titleStyle = MaterialTheme.typography.titleLarge.copy(
@@ -145,32 +136,34 @@ fun EditNote(note: Note?, addNoteAction: (NoteAction) -> Unit, modifier: Modifie
             onValueChange = { title = it },
             value = title,
             textStyle = titleStyle,
-            backColor = note?.color ?: Color.Gray,
+            backColor = note.color,
         )
         TextInputBox(
             onValueChange = { content = it }, value = content, textStyle = contentStyle,
-            backColor = note?.color?.copy(alpha = .25f) ?: Color.Transparent, singleLine = false
+            backColor = note.color.copy(alpha = .25f), singleLine = false
         )
         TextInputBox(onValueChange = { category = it }, value = category, textStyle = contentStyle)
 
-        Text(text = "Note Type: ${note?.noteType ?: "Regular"}", style = contentStyle)
+        Text(text = "Note Type: ${note.noteType}", style = contentStyle)
         Text(
-            text = "Created At: ${Instant.fromEpochMilliseconds(note?.createdAt ?: System.currentTimeMillis())}",
+            text = "Created At: ${Instant.fromEpochMilliseconds(note.createdAt)}",
             style = contentStyle
         )
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+
             ElevatedButton(onClick = {
                 if (title.isNotBlank() && content.isNotBlank()) {
                     deleteNote()
                 }
             }) { Text(text = "Delete Note") }
-            ElevatedButton(onClick = {
-                if (title.isNotBlank() && content.isNotBlank()) {
+
+            if (title.isNotBlank() && content.isNotBlank()) {
+                ElevatedButton(onClick = {
                     saveNote()
-                }
-            }) { Text(text = "Save Note") }
+                }) { Text(text = "Save Note") }
+            }
         }
     }
 }

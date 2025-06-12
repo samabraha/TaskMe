@@ -11,7 +11,7 @@ import ui.HomeUI
 import java.util.logging.Logger
 
 
-val logger: Logger = Logger.getLogger("com.develogica.heelel_desk")
+val logger: Logger = Logger.getLogger("com.develogica.task_me")
 
 @Composable
 @Preview

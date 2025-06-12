@@ -20,7 +20,7 @@ object AppManager {
         val connection = DriverManager.getConnection(connStr)
         noteDAO = NoteDAO(connection)
         noteRepository = NoteRepository(noteDAO)
-        noteDAO.createTable()
+        noteDAO.createTable(dropExisting = true)
         noteViewModel = NoteViewModel(noteRepository)
     }
 }

@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-
     val composeBom = platform("androidx.compose:compose-bom:2025.05.00")
     implementation(composeBom)
 
@@ -28,10 +27,18 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
     implementation(compose.materialIconsExtended)
+
     val jsonSerializerVersion = "1.8.0"
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$jsonSerializerVersion")
+
     val sqliteVersion = "3.49.1.0"
     implementation("org.xerial:sqlite-jdbc:$sqliteVersion")
+
+    val junitVersion = "5.13.1"
+    testImplementation(platform("org.junit:junit-bom:$junitVersion"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
 }
 
 compose.desktop {
@@ -43,5 +50,12 @@ compose.desktop {
             packageName = "TaskMe"
             packageVersion = "1.0.0"
         }
+    }
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
     }
 }

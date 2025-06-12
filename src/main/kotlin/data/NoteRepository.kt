@@ -9,7 +9,7 @@ class NoteRepository(val noteDAO: NoteDAO) {
 
     fun addNote(note: Note) {
         notes.add(note)
-        noteDAO.upsertNote(note)
+        noteDAO.upsertNote(NoteDTO.fromNote(note))
     }
 
     @OptIn(ExperimentalUuidApi::class)
@@ -20,7 +20,7 @@ class NoteRepository(val noteDAO: NoteDAO) {
 
     fun loadAllNotes(): List<Note> {
         if (notes.isEmpty()) {
-            notes.addAll(noteDAO.getAllNotes())
+            notes.addAll(noteDAO.getAllNotes().map(NoteDTO::toNote))
         }
         return notes.toList()
     }

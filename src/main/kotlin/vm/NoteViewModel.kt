@@ -3,6 +3,7 @@
 package vm
 
 import data.NoteRepository
+import logger
 import model.Note
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -23,6 +24,7 @@ class NoteViewModel(val noteRepository: NoteRepository) {
     }
 
     fun updateNote(note: Note) {
+        logger.info("color.value: ${note.color.value}")
         noteRepository.addNote(note)
     }
 
