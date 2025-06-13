@@ -62,7 +62,7 @@ class NoteDAO(val connection: Connection) {
         return notes
     }
 
-    fun createTable(dropExisting: Boolean) {
+    fun createTable(dropExisting: Boolean = false) {
         logger.info("Creating notes table if it does not exist")
         val columnDefs = NoteTable.entries.joinToString { "${it.columnName} ${it.type.text}" }
 
