@@ -8,5 +8,5 @@ import vm.HomeViewModel
 @Composable
 fun HomeUI(homeViewModel: HomeViewModel, modifier: Modifier = Modifier) {
     Text("Welcome to the Home Screen")
-    NoteHomeUI(noteViewModel = AppManager.noteViewModel, modifier = modifier)
+    TaskHomeUI(taskViewModel = AppManager.taskViewModel, modifier = modifier)
 }

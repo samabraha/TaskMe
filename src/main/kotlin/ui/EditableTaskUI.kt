@@ -2,37 +2,27 @@
 
 package ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import model.Note
-import vm.NoteAction
+import kotlinx.serialization.json.Json
+import model.Task
+import vm.TaskAction
 import java.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 
 @Composable
-fun EditableNote(note: Note, addNoteAction: (NoteAction) -> Unit, modifier: Modifier = Modifier) {
-    var title by remember(note.id) { mutableStateOf(note.title) }
-    var content by remember(note.id) { mutableStateOf(note.content) }
-    var category by remember(note.id) { mutableStateOf(note.category) }
+fun EditableNote(task: Task, addNoteAction: (TaskAction) -> Unit, modifier: Modifier = Modifier) {
+    var title by remember(task.id) { mutableStateOf(task.title) }
+    var content by remember(task.id) { mutableStateOf(task.content) }
+    var category by remember(task.id) { mutableStateOf(task.category) }
+    var tags by remember(task.id) { mutableStateOf(Json.encodeToString<Set<String>>(task.tags)) }
 
     val titleStyle = MaterialTheme.typography.titleLarge.copy(
         color = Color.White,
@@ -43,39 +33,45 @@ fun EditableNote(note: Note, addNoteAction: (NoteAction) -> Unit, modifier: Modi
     val contentStyle = MaterialTheme.typography.bodyLarge
 
     val fields = listOf(
-        InputField(value = title, onValueChange = { title = it }, textStyle = titleStyle, backgroundColor = note.color),
+        InputField(value = title, onValueChange = { title = it }, textStyle = titleStyle, backgroundColor = task.color),
         InputField(
             value = content,
             onValueChange = { content = it },
             textStyle = contentStyle,
-            backgroundColor = note.color.copy(alpha = 0.5f)
+            singleLine = false,
+            backgroundColor = task.color.copy(alpha = 0.5f)
         ),
         InputField(
             value = category,
             onValueChange = { category = it },
             textStyle = contentStyle,
-            backgroundColor = note.color.copy(alpha = 0.5f)
+            backgroundColor = task.color.copy(alpha = 0.5f)
         ),
+        InputField(
+            value = tags,
+            onValueChange = { tags = it }, textStyle = contentStyle
+        )
     )
 
     val saveNote: () -> Unit = {
-        val newNote = note.let {
-            Note(
+        val newTask = task.let {
+            Task(
                 id = it.id,
                 title = title,
                 content = content,
                 category = category,
                 createdAt = it.createdAt,
-                noteType = it.noteType,
+                taskType = it.taskType,
+                tags = Json.decodeFromString(tags),
                 color = it.color
             )
         }
 
-        addNoteAction(NoteAction.AddNote(newNote))
+        addNoteAction(TaskAction.AddTask(newTask))
     }
 
     val deleteNote: () -> Unit = {
-        addNoteAction(NoteAction.DeleteNote(note.id))
+        addNoteAction(TaskAction.DeleteTask(task.id))
     }
 
     Column(
@@ -83,9 +79,9 @@ fun EditableNote(note: Note, addNoteAction: (NoteAction) -> Unit, modifier: Modi
     ) {
         TextInputBoxes(fields)
 
-        Text(text = "Note Type: ${note.noteType}", style = contentStyle)
+        Text(text = "Note Type: ${task.taskType}", style = contentStyle)
         Text(
-            text = dateTimeFormatter.format(Instant.ofEpochMilli(note.createdAt)), style = contentStyle
+            text = dateTimeFormatter.format(Instant.ofEpochMilli(task.createdAt)), style = contentStyle
         )
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
@@ -127,7 +123,6 @@ fun TextInputBox(
         )
     )
 }
-
 
 data class InputField(
     val value: String,

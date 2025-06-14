@@ -21,23 +21,23 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import model.Note
+import model.Task
 import java.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 
 
 @Composable
-fun NoteList(notes: List<Note>, selectNote: (Note) -> Unit, modifier: Modifier = Modifier) {
+fun TaskList(tasks: List<Task>, selectNote: (Task) -> Unit, modifier: Modifier = Modifier) {
     LazyColumn(modifier = modifier.fillMaxWidth()) {
-        items(notes, key = { it.id }) { note ->
-            NoteView(note = note, selectNote = selectNote)
+        items(tasks, key = { it.id }) { note ->
+            TaskView(task = note, selectNote = selectNote)
         }
     }
 }
 
 
 @Composable
-fun NoteView(note: Note, selectNote: (Note) -> Unit, modifier: Modifier = Modifier) {
+fun TaskView(task: Task, selectNote: (Task) -> Unit, modifier: Modifier = Modifier) {
     val titleStyle = MaterialTheme.typography.titleLarge.copy(
         fontWeight = FontWeight.Bold, shadow = Shadow(color = Color.Black, offset = Offset(1f, 1f), blurRadius = 2f)
     )
@@ -47,23 +47,23 @@ fun NoteView(note: Note, selectNote: (Note) -> Unit, modifier: Modifier = Modifi
 
     Card(
         modifier = modifier.padding(horizontal = 6.dp, vertical = 3.dp).fillMaxSize().padding(4.dp),
-        onClick = { selectNote(note) }) {
+        onClick = { selectNote(task) }) {
         Text(
-            text = note.title,
+            text = task.title,
             style = titleStyle,
             textAlign = TextAlign.Center,
             color = Color.White,
-            modifier = Modifier.background(note.color).fillMaxWidth().padding(5.dp)
+            modifier = Modifier.background(task.color).fillMaxWidth().padding(5.dp)
         )
         Row(
-            modifier = Modifier.fillMaxWidth().background(color = note.color.copy(alpha = 0.5f)),
+            modifier = Modifier.fillMaxWidth().background(color = task.color.copy(alpha = 0.5f)),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
-                text = dateTimeFormatter.format(Instant.ofEpochMilli(note.createdAt)),
+                text = dateTimeFormatter.format(Instant.ofEpochMilli(task.createdAt)),
                 style = smallTextStyle
             )
-            Text(text = "Note Type: ${note.noteType}")
+            Text(text = "Note Type: ${task.taskType}")
         }
     }
 }
