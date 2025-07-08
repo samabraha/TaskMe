@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package ui
 
@@ -20,6 +20,7 @@ import vm.TaskAction
 import vm.TaskViewModel
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.time.ExperimentalTime
 import kotlin.uuid.ExperimentalUuidApi
 
 
@@ -67,5 +68,3 @@ fun CategoryList(categories: List<String>, filterAction: (String) -> Unit) {
         }
     }
 }
-
-

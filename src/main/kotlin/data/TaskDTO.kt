@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package data
 
@@ -9,6 +9,8 @@ import logger
 import model.Task
 import model.TaskStatus
 import model.TaskType
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -23,8 +25,8 @@ data class TaskDTO(
     val tags: String,
     val taskType: String,
     val subtaskIDs: String,
-    val createdAt: Long,
-    val updatedAt: Long,
+    val createdAt: Instant,
+    val updatedAt: Instant,
     val color: Int
 ) {
     fun toTask(): Task {

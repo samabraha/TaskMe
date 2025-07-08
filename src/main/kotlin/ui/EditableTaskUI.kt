@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package ui
 
@@ -15,6 +15,8 @@ import kotlinx.serialization.json.Json
 import model.Task
 import vm.TaskAction
 import java.time.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.toJavaInstant
 import kotlin.uuid.ExperimentalUuidApi
 
 @Composable
@@ -81,7 +83,7 @@ fun EditableNote(task: Task, addNoteAction: (TaskAction) -> Unit, modifier: Modi
 
         Text(text = "Note Type: ${task.taskType}", style = contentStyle)
         Text(
-            text = dateTimeFormatter.format(Instant.ofEpochMilli(task.createdAt)), style = contentStyle
+            text = dateTimeFormatter.format(task.createdAt.toJavaInstant()), style = contentStyle
         )
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly

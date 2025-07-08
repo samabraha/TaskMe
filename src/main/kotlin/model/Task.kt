@@ -1,7 +1,12 @@
+@file:OptIn(ExperimentalTime::class)
+
 package model
 
 import androidx.compose.ui.graphics.Color
 import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -14,8 +19,8 @@ class Task(
     val status: TaskStatus = TaskStatus.Unchecked,
     val statusUpdateDT: Long = System.currentTimeMillis(),
     val tags: Set<String> = emptySet(),
-    val updatedAt: Long = System.currentTimeMillis(),
-    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Instant = Clock.System.now(),
+    val createdAt: Instant = Clock.System.now(),
     val taskType: TaskType = TaskType.Regular,
     val subtaskIDs: Set<Uuid> = emptySet(),
     val color: Color = Color(

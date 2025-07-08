@@ -1,13 +1,9 @@
-@file:OptIn(ExperimentalUuidApi::class)
+@file:OptIn(ExperimentalUuidApi::class, ExperimentalTime::class)
 
 package ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
@@ -22,7 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import model.Task
-import java.time.Instant
+import kotlin.time.ExperimentalTime
+import kotlin.time.toJavaInstant
 import kotlin.uuid.ExperimentalUuidApi
 
 
@@ -60,7 +57,7 @@ fun TaskView(task: Task, selectNote: (Task) -> Unit, modifier: Modifier = Modifi
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
-                text = dateTimeFormatter.format(Instant.ofEpochMilli(task.createdAt)),
+                text = dateTimeFormatter.format(task.createdAt.toJavaInstant()),
                 style = smallTextStyle
             )
             Text(text = "Note Type: ${task.taskType}")

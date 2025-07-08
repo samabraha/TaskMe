@@ -1,8 +1,12 @@
+@file:OptIn(ExperimentalTime::class)
+
 package data
 
 import logger
 import java.sql.Connection
 import java.sql.PreparedStatement
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -29,8 +33,8 @@ class TaskDAO(val connection: Connection) {
             statement.setString(NoteTable.STATUS.columnIndex, note.status)
             statement.setLong(NoteTable.STATUS_UPDATE_DT.columnIndex, note.statusUpdateDT)
             statement.setString(NoteTable.TAGS.columnIndex, note.tags)
-            statement.setLong(NoteTable.CREATED_DT.columnIndex, note.createdAt)
-            statement.setLong(NoteTable.UPDATED_DT.columnIndex, note.updatedAt)
+            statement.setLong(NoteTable.CREATED_DT.columnIndex, note.createdAt.toEpochMilliseconds())
+            statement.setLong(NoteTable.UPDATED_DT.columnIndex, note.updatedAt.toEpochMilliseconds())
             statement.setString(NoteTable.TASK_TYPE.columnIndex, note.taskType)
             statement.setString(NoteTable.SUB_TASK_IDS.columnIndex, note.subtaskIDs)
             statement.setInt(NoteTable.COLOR.columnIndex, note.color)
@@ -67,8 +71,8 @@ class TaskDAO(val connection: Connection) {
                             status = status,
                             statusUpdateDT = statusUpdateDT,
                             tags = tags,
-                            createdAt = createdAt,
-                            updatedAt = updatedAt,
+                            createdAt = Instant.fromEpochMilliseconds(createdAt),
+                            updatedAt = Instant.fromEpochMilliseconds(updatedAt),
                             color = color,
                             taskType = noteType,
                             subtaskIDs = subtaskIDs
